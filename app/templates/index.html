@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Divvy Station Utilization</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <link rel="stylesheet" href="https://curiouschi.com/css/leaflet.css" />
+  <link rel="stylesheet" href="https://leaflet.github.io/Leaflet.label/leaflet.label.css" />
+
+  <script src="https://curiouschi.com/js/leaflet.js"></script>
+  <script src="https://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
+
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+    html, body, #map {
+      height: 100%;
+    }
+    .info {
+        padding: 6px 8px;
+        font: 14px/16px Arial, Helvetica, sans-serif;
+        background: white;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+    }
+    .info h2 {
+        margin: 0 0 5px;
+        color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script>
+    var map = L.map('map').setView([41.878, -87.657], 14);
+
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaGlnaG1pbGVhZ2UiLCJhIjoieEd0UTU4QSJ9.mUJSezM0jEbabYL6rafKtg', {
+      maxZoom: 16,
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+        '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+        'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+      id: 'examples.map-20v6611k'
+    }).addTo(map);
+
+    var info = L.control();
+
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+        this.update();
+        return this._div;
+    };
+
+    info.update = function () {
+      this._div.innerHTML = '<h2>{{ coverage }}% Station Coverage</h2>';
+    };
+
+    info.addTo(map);
+
+    {% for station in stations %}
+    var station_{{ station.id }} = L.circle([{{ station.lat }}, {{ station.lng }}], 55, {color: "{{ 'blue' if station.id in trips else 'red' }}", fillOpacity: 0.55}).addTo(map);
+    {% endfor %}
+
+  </script>
+</body>
+</html>
